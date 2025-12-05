@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tab Close Guard Settings</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Tab Close Guard</h1>
+
+    <div class="section">
+      <label class="toggle-container">
+        <input type="checkbox" id="blockAllSites">
+        <span class="toggle-label">Block on all websites</span>
+      </label>
+    </div>
+
+    <div class="section" id="siteManagement">
+      <h2>Manage Specific Sites</h2>
+      <p class="help-text">Add websites where Ctrl+W should be disabled. You can use wildcards (*).</p>
+
+      <div class="add-site-form">
+        <input type="text" id="siteInput" placeholder="e.g., *.google.com or example.com">
+        <button id="addSiteBtn">Add Site</button>
+        <button id="addCurrentSiteBtn" title="Add current tab's site">Add Current</button>
+      </div>
+
+      <div class="sites-list" id="sitesList">
+        <!-- Sites will be populated here -->
+      </div>
+    </div>
+
+    <div class="footer">
+      <p class="info-text">Disables Ctrl+W and Ctrl+Shift+W shortcuts</p>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
