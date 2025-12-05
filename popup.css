@@ -128,10 +128,38 @@ button:active {
   margin-bottom: 0;
 }
 
+.site-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .site-name {
   font-family: 'Monaco', 'Courier New', monospace;
   color: #333;
-  flex: 1;
+  font-weight: 500;
+}
+
+.app-mode-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.app-mode-toggle {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  margin: 0;
+}
+
+.app-mode-label {
+  font-size: 11px;
+  color: #666;
+  font-weight: normal;
 }
 
 .remove-btn {

@@ -35,17 +35,38 @@ function renderSitesList(sites) {
     return;
   }
 
-  sitesList.innerHTML = sites.map(site => `
-    <div class="site-item">
-      <span class="site-name">${escapeHtml(site)}</span>
-      <button class="remove-btn" data-site="${escapeHtml(site)}">Remove</button>
-    </div>
-  `).join('');
+  sitesList.innerHTML = sites.map(site => {
+    const pattern = typeof site === 'string' ? site : site.pattern;
+    const appModeOnly = typeof site === 'object' ? site.appModeOnly : false;
+
+    return `
+      <div class="site-item">
+        <div class="site-info">
+          <span class="site-name">${escapeHtml(pattern)}</span>
+          <label class="app-mode-checkbox">
+            <input type="checkbox"
+                   class="app-mode-toggle"
+                   data-site="${escapeHtml(pattern)}"
+                   ${appModeOnly ? 'checked' : ''}>
+            <span class="app-mode-label">App/PWA mode only</span>
+          </label>
+        </div>
+        <button class="remove-btn" data-site="${escapeHtml(pattern)}">Remove</button>
+      </div>
+    `;
+  }).join('');
 
   // Add event listeners to remove buttons
   document.querySelectorAll('.remove-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       removeSite(btn.dataset.site);
+    });
+  });
+
+  // Add event listeners to app mode checkboxes
+  document.querySelectorAll('.app-mode-toggle').forEach(checkbox => {
+    checkbox.addEventListener('change', (e) => {
+      toggleAppMode(e.target.dataset.site, e.target.checked);
     });
   });
 }
@@ -68,12 +89,19 @@ function addSite(site) {
   chrome.storage.sync.get(['enabledSites'], (result) => {
     const enabledSites = result.enabledSites || [];
 
-    if (enabledSites.includes(site)) {
+    // Check if site already exists (handle both old string format and new object format)
+    const exists = enabledSites.some(s => {
+      const pattern = typeof s === 'string' ? s : s.pattern;
+      return pattern === site;
+    });
+
+    if (exists) {
       alert('This site is already in the list');
       return;
     }
 
-    enabledSites.push(site);
+    // Add as object with pattern and appModeOnly flag
+    enabledSites.push({ pattern: site, appModeOnly: false });
     chrome.storage.sync.set({ enabledSites }, () => {
       renderSitesList(enabledSites);
       siteInput.value = '';
@@ -82,13 +110,34 @@ function addSite(site) {
 }
 
 // Remove a site
-function removeSite(site) {
+function removeSite(pattern) {
   chrome.storage.sync.get(['enabledSites'], (result) => {
     const enabledSites = result.enabledSites || [];
-    const filtered = enabledSites.filter(s => s !== site);
+    const filtered = enabledSites.filter(s => {
+      const sitePattern = typeof s === 'string' ? s : s.pattern;
+      return sitePattern !== pattern;
+    });
 
     chrome.storage.sync.set({ enabledSites: filtered }, () => {
       renderSitesList(filtered);
+    });
+  });
+}
+
+// Toggle app mode only setting for a site
+function toggleAppMode(pattern, appModeOnly) {
+  chrome.storage.sync.get(['enabledSites'], (result) => {
+    const enabledSites = result.enabledSites || [];
+    const updated = enabledSites.map(s => {
+      const sitePattern = typeof s === 'string' ? s : s.pattern;
+      if (sitePattern === pattern) {
+        return { pattern: sitePattern, appModeOnly };
+      }
+      return typeof s === 'string' ? { pattern: s, appModeOnly: false } : s;
+    });
+
+    chrome.storage.sync.set({ enabledSites: updated }, () => {
+      console.log('Updated app mode setting for', pattern, 'to', appModeOnly);
     });
   });
 }
