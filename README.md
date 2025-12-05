@@ -157,4 +157,6 @@ Chrome processes Ctrl+W at the browser level before JavaScript can intercept it.
 
 ## License
 
-Free to use and modify.
+MIT License - see [LICENSE](LICENSE) file for details.
+
+Copyright (c) 2024 Avinash Joshi

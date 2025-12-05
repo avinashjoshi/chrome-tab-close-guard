@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- Background -->
+  <rect width="128" height="128" rx="24" fill="#4285f4"/>
+
+  <!-- Tab shape (white) -->
+  <g transform="translate(24, 40)">
+    <!-- Tab body -->
+    <rect x="0" y="12" width="80" height="48" rx="4" fill="white"/>
+    <!-- Tab top -->
+    <path d="M 8 12 L 8 4 Q 8 0 12 0 L 28 0 Q 32 0 32 4 L 32 12 Z" fill="white"/>
+  </g>
+
+  <!-- Shield icon overlay -->
+  <g transform="translate(44, 55)">
+    <path d="M 20 0 L 32 4 L 32 16 Q 32 24 20 30 Q 8 24 8 16 L 8 4 Z" fill="#34a853" stroke="white" stroke-width="2"/>
+    <!-- Checkmark -->
+    <path d="M 15 16 L 18 20 L 26 10" stroke="white" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>
