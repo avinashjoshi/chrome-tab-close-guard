@@ -1,0 +1,56 @@
+name: Release Chrome Extension
+
+on:
+  push:
+    branches: [master]
+    paths: [manifest.json]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Read version from manifest.json
+        id: v
+        run: |
+          VERSION=$(jq -r '.version' manifest.json)
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Check if release already exists
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh release view "${{ steps.v.outputs.tag }}" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "Release ${{ steps.v.outputs.tag }} already exists — skipping."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build extension zip
+        if: steps.check.outputs.exists == 'false'
+        run: |
+          zip -r "tab-close-guard-${{ steps.v.outputs.version }}.zip" \
+            manifest.json content.js injected.js \
+            popup.html popup.css popup.js \
+            icon.svg icon16.png icon48.png icon128.png \
+            LICENSE
+
+      - name: Create release with zip asset
+        if: steps.check.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ steps.v.outputs.tag }}" \
+            "tab-close-guard-${{ steps.v.outputs.version }}.zip" \
+            --title "${{ steps.v.outputs.tag }}" \
+            --generate-notes
